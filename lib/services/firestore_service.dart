@@ -1,4 +1,3 @@
-// lib/services/firestore_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/loan.dart';
 import '../models/book.dart';
@@ -7,6 +6,7 @@ import '../core/constants.dart';
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  // Guarda un préstamo en la subcolección 'users/{uid}/loans'
   Future<void> saveLoan(Loan loan) async {
     final ref = _db
         .collection(usersCollection)
@@ -15,6 +15,7 @@ class FirestoreService {
     await ref.add(loan.toJson());
   }
 
+  // Stream que devuelve la lista de loans del usuario (ordenadas por fecha)
   Stream<List<Loan>> streamLoansForUser(String userId) {
     final ref =
         _db.collection(usersCollection).doc(userId).collection(loansCollection);
@@ -25,6 +26,7 @@ class FirestoreService {
     });
   }
 
+  // Marca un préstamo como devuelto actualizando los campos correspondientes
   Future<void> markReturned(String userId, String loanId) async {
     final docRef = _db
         .collection(usersCollection)

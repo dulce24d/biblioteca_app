@@ -49,7 +49,7 @@ class BookCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           child: Row(
             children: [
-              // Miniatura
+              // Miniatura (clip para bordes redondeados)
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: SizedBox(

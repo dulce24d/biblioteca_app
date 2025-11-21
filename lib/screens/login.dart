@@ -1,4 +1,3 @@
-// lib/screens/login.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
@@ -21,14 +20,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _login() async {
     setState(() => loading = true);
     try {
+      // authNotifierProvider.signIn delega a AuthService para autenticación con Firebase
       await ref
           .read(authNotifierProvider)
           .signIn(emailCtrl.text.trim(), passCtrl.text.trim());
       if (!mounted) return;
-      // Navegar al Home (reemplaza si tu app usa rutas nombradas)
+      // Si el login es exitoso navegamos al Home reemplazando la pila
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const HomeScreen()));
     } catch (e) {
+      // Mostramos el error con helper
       showErrorSnackBar(context, e.toString());
     } finally {
       if (mounted) setState(() => loading = false);
@@ -37,6 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   void dispose() {
+    // liberamos controladores para evitar memory leaks
     emailCtrl.dispose();
     passCtrl.dispose();
     super.dispose();
@@ -72,7 +74,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Email
+                    // Campo email
                     TextField(
                       controller: emailCtrl,
                       keyboardType: TextInputType.emailAddress,
@@ -83,7 +85,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Contraseña
+                    // Campo contraseña
                     TextField(
                       controller: passCtrl,
                       obscureText: true,
@@ -94,7 +96,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 18),
 
-                    // Botón de Login
+                    // Botón de Login o loader si loading == true
                     loading
                         ? const SizedBox(
                             height: 48,
@@ -114,7 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                     const SizedBox(height: 12),
 
-                    // Link a registro
+                    // Link a registro: abre pantalla Register con push
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

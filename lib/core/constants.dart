@@ -1,4 +1,3 @@
-// lib/core/constants.dart
 // Constantes globales (lowerCamelCase para cumplir linter)
 const String usersCollection = 'users';
 const String loansCollection = 'loans';

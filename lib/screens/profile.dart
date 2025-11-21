@@ -1,4 +1,3 @@
-// lib/screens/profile.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
@@ -9,6 +8,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Obtener usuario actual desde authStateProvider
     final user = ref.watch(authStateProvider).asData?.value;
     final displayName =
         user?.displayName ?? ''; // nombre proveniente de Firebase Auth
@@ -53,12 +53,14 @@ class ProfileScreen extends ConsumerWidget {
             // Botones de acción con separación
             ElevatedButton.icon(
               onPressed: () {
+                // Navegar a pantalla de Favoritos
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const FavoritesScreen()));
               },
               icon: const Icon(Icons.favorite, color: Colors.red),
               label: const Text('Ver favoritos'),
               style: ElevatedButton.styleFrom(
+                // Aquí usar blanco como background (diseño particular)
                 backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(
@@ -73,8 +75,9 @@ class ProfileScreen extends ConsumerWidget {
             // Botón Cerrar sesión, al final y separado
             ElevatedButton.icon(
               onPressed: () async {
+                // Llamamos al provider que delega en AuthService.signOut()
                 await ref.read(authNotifierProvider).signOut();
-                // opcional: navegar a login y limpiar stack
+                // Navegación: limpiar stack y llevar a ruta '/'
                 Navigator.of(context)
                     .pushNamedAndRemoveUntil('/', (route) => false);
               },
@@ -82,6 +85,7 @@ class ProfileScreen extends ConsumerWidget {
                   const Icon(Icons.logout, color: Color.fromARGB(255, 0, 0, 0)),
               label: const Text('Cerrar sesión'),
               style: ElevatedButton.styleFrom(
+                // botón blanco con texto/ícono oscuro (diseño elegido)
                 backgroundColor: const Color.fromARGB(255, 254, 254, 254),
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(

@@ -1,3 +1,6 @@
+/*widget sencillo que delega la acción onReturn al padre 
+— esto es útil para mantener la UI desacoplada de la lógica 
+de acceso a la base de datos.*/
 import 'package:flutter/material.dart';
 import '../models/loan.dart';
 import '../core/utils.dart';

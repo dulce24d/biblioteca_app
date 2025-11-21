@@ -8,6 +8,7 @@ import 'providers/auth_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Inicializar Firebase con opciones generadas por FlutterFire CLI
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -16,12 +17,13 @@ class MyApp extends ConsumerWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Observamos el estado de autenticación para decidir la pantalla inicial
     final authState = ref.watch(authStateProvider);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LibSeek',
-      // dentro de MaterialApp (...)
+      // Tema global de la app (colores, AppBar, cards, inputs)
       theme: ThemeData(
         brightness: Brightness.light,
         primarySwatch: Colors.indigo,
@@ -55,6 +57,7 @@ class MyApp extends ConsumerWidget {
         ),
       ),
 
+      // home depende del estado de autenticación: si hay usuario, show HomeScreen, sino LoginScreen
       home: authState.when(
         data: (user) => user != null ? const HomeScreen() : const LoginScreen(),
         loading: () =>

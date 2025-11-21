@@ -1,3 +1,8 @@
+// Providers relacionados con autenticación:
+//  - authServiceProvider: instancia de AuthService (abstracción de FirebaseAuth)
+//  - authStateProvider: stream del usuario actual (User?)
+//  - authNotifierProvider: Provider que expone acciones síncronas/async (signIn/register/signOut)
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
@@ -18,6 +23,7 @@ class AuthNotifier {
   final Ref ref;
   AuthNotifier(this.ref);
 
+  // Delegan en AuthService — buena separación de responsabilidades.
   Future<void> signIn(String email, String password) async {
     final srv = ref.read(authServiceProvider);
     await srv.signIn(email, password);
@@ -33,5 +39,6 @@ class AuthNotifier {
     await srv.signOut();
   }
 
+  // Getter conveniente para obtener el usuario actual (puede ser null).
   User? get currentUser => ref.read(authServiceProvider).currentUser();
 }

@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import '../models/book.dart';
 import '../core/constants.dart';
 
+// Servicio que realiza las llamadas HTTP a la API de Google Books usando Dio.
+// Tiene soporte para usar un proxy (corsProxy) cuando la app corre en web.
 class BooksService {
   final Dio _dio;
 
@@ -14,6 +16,7 @@ class BooksService {
               receiveTimeout: 10000,
             ));
 
+  // Obtener un volumen por id (útil para detalles)
   Future<Book> getVolumeById(String id) async {
     final String url = corsProxy != null
         ? '${corsProxy!}/https://www.googleapis.com/books/v1/volumes/$id'
@@ -24,6 +27,7 @@ class BooksService {
     return Book.fromJson(data);
   }
 
+  // Buscar libros por query. Si corsProxy está activo construye una URL absoluta para el proxy.
   Future<List<Book>> searchBooks(String query, {int maxResults = 20}) async {
     final q = query.trim();
     if (q.isEmpty) return <Book>[];
@@ -53,11 +57,13 @@ class BooksService {
 
       final data = resp.data as Map<String, dynamic>? ?? {};
       final items = data['items'] as List<dynamic>? ?? [];
+      // Convertimos cada item (volume) a Book usando Book.fromJson
       return items
           .cast<Map<String, dynamic>>()
           .map((m) => Book.fromJson(m))
           .toList();
     } on DioError catch (e) {
+      // Manejamos distintos tipos de errores de Dio para dar mensajes más claros
       if (e.type == DioErrorType.response) {
         final status = e.response?.statusCode;
         final msg = e.response?.statusMessage ?? e.message;
@@ -71,6 +77,7 @@ class BooksService {
         throw Exception('HTTP request failed (${e.type}): ${e.message}');
       }
     } catch (e) {
+      // Excepciones genéricas
       throw Exception('Error buscando libros: $e');
     }
   }

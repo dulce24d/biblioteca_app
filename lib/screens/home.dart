@@ -10,13 +10,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // índice seleccionado del BottomNavigationBar
   int idx = 0;
+  // páginas correspondientes a cada pestaña (Catálogo, Historial, Perfil)
   final pages = const [CatalogScreen(), HistoryScreen(), ProfileScreen()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // body muestra la página actual según idx
       body: pages[idx],
+      // barra inferior que permite cambiar idx y por tanto la página mostrada
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: idx,
         onTap: (i) => setState(() => idx = i),

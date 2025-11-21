@@ -1,3 +1,7 @@
+// Modelo que representa un libro. Contiene dos constructores factory:
+//  - fromJson: para parsear items de la API de Google Books (structure volumeInfo)
+//  - fromMap: para parsear documentos guardados en Firestore (mapa plano)
+
 class Book {
   final String id;
   final String title;
@@ -14,6 +18,7 @@ class Book {
   });
 
   /// Construye desde la respuesta de Google Books (volumes item)
+  /// IMPORTANTE: la estructura de Google Books usa `volumeInfo` y `imageLinks`.
   factory Book.fromJson(Map<String, dynamic> json) {
     final volumeInfo = json['volumeInfo'] as Map<String, dynamic>? ?? {};
     final imageLinks = volumeInfo['imageLinks'] as Map<String, dynamic>? ?? {};
@@ -29,6 +34,7 @@ class Book {
   }
 
   /// Construye desde el mapa que nosotros guardamos en Firestore (toJson())
+  /// Esto permite leer documentos que guardaste con toJson().
   factory Book.fromMap(Map<String, dynamic> map) {
     return Book(
       id: (map['id'] as String?) ?? '',
@@ -41,6 +47,7 @@ class Book {
     );
   }
 
+  // Convierte el modelo a un mapa plano. Útil para guardar en Firestore.
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,

@@ -1,3 +1,6 @@
+// Modelo que representa un préstamo (loan).
+// Incluye conversiones para Firestore (toJson) y desde documento (fromJson).
+
 class Loan {
   final String id;
   final String bookId;
@@ -17,6 +20,8 @@ class Loan {
     this.returned = false,
   });
 
+  // Construye Loan a partir del documento de Firestore.
+  // Nota: asume que dateStart y dateEnd están guardados como ISO strings.
   factory Loan.fromJson(Map<String, dynamic> json, String docId) {
     return Loan(
       id: docId,
@@ -31,6 +36,7 @@ class Loan {
     );
   }
 
+  // Convierte a mapa para guardar en Firestore.
   Map<String, dynamic> toJson() => {
         'bookId': bookId,
         'bookTitle': bookTitle,

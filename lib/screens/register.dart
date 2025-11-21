@@ -28,7 +28,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         password: passCtrl.text.trim(),
       );
 
-      // actualizar displayName
+      // actualizar displayName (campo visible en Firebase Auth)
       await cred.user?.updateDisplayName(nameCtrl.text.trim());
 
       // crear documento de perfil en Firestore (colección users)
@@ -44,6 +44,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (!mounted) return;
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
+      // mostramos mensaje legible al usuario
       showErrorSnackBar(context, e.message ?? 'Error al registrar');
     } catch (e) {
       showErrorSnackBar(context, e.toString());

@@ -1,4 +1,6 @@
-// lib/providers/recommended_provider.dart
+// Proveedor que obtiene "recomendados" mediante búsquedas aleatorias
+// en Google Books usando palabras semillas (seeds).
+
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/book.dart';

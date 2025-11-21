@@ -1,3 +1,4 @@
+// Proveedores para historial de préstamos (loans).
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/firestore_service.dart';
 import '../models/loan.dart';
@@ -6,6 +7,7 @@ import 'auth_provider.dart';
 final firestoreServiceProvider =
     Provider<FirestoreService>((ref) => FirestoreService());
 
+// Stream: userLoansProvider (escucha cambios en la colección de loans para el usuario).
 final userLoansProvider = StreamProvider.autoDispose<List<Loan>>((ref) {
   final authState = ref.watch(authStateProvider);
   final firestore = ref.read(firestoreServiceProvider);
@@ -14,6 +16,7 @@ final userLoansProvider = StreamProvider.autoDispose<List<Loan>>((ref) {
   return firestore.streamLoansForUser(user.uid);
 });
 
+// Actions: historyActionsProvider para añadir y marcar devuelto (markReturned).
 final historyActionsProvider =
     Provider<HistoryActions>((ref) => HistoryActions(ref));
 

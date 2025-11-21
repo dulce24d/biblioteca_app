@@ -1,4 +1,5 @@
-// lib/providers/favorites_provider.dart
+// Proveedores para manejar favoritos: stream (userFavoritesProvider) y acciones (favoritesActionsProvider).
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/firestore_service.dart';
 import '../models/book.dart';

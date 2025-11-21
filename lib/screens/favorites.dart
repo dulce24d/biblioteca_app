@@ -1,4 +1,6 @@
-// lib/screens/favorites.dart
+// Pantalla de favoritos: lista de Book Cards dentro de Cards blancas con acciones Ver/Eliminar.
+// Usa proxy para images (corsProxy) para evitar bloqueos en web.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,7 +9,7 @@ import '../models/book.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/auth_provider.dart';
 import '../core/constants.dart';
-import 'book_detail_placeholder.dart'; // tu pantalla de detalle
+import 'book_detail_placeholder.dart'; // pantalla de detalle
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({Key? key}) : super(key: key);

@@ -1,4 +1,6 @@
-// lib/screens/book_detail_placeholder.dart
+// Pantalla de detalle del libro. Muestra portada (proxificada para evitar CORS),
+// título, autores, descripción y acciones: solicitar préstamo y marcar favorito.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -15,6 +17,7 @@ class BookDetailScreen extends ConsumerWidget {
   final Book book;
   const BookDetailScreen({required this.book, Key? key}) : super(key: key);
 
+  // Construye la URL de la imagen forzando https y añadiendo proxy si está configurado.
   String _proxiedImageUrl(String rawUrl) {
     if (rawUrl.isEmpty) return '';
     var fixed = rawUrl;
@@ -28,7 +31,7 @@ class BookDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Aquí usamos authStateProvider, por eso es necesario importar auth_provider.dart
+    // Observa el estado del usuario para decidir si mostrar acciones (p. ej. solicitar préstamo).
     final user = ref.watch(authStateProvider).asData?.value;
     final imageUrl = _proxiedImageUrl(book.thumbnail);
 
@@ -99,6 +102,7 @@ class BookDetailScreen extends ConsumerWidget {
                           dateEnd: null,
                           returned: false,
                         );
+                        // Delegamos a historyActionsProvider para guardar en Firestore.
                         await ref.read(historyActionsProvider).addLoan(loan);
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -112,7 +116,7 @@ class BookDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Botón favorito
+                // Botón favorito: usa userFavoritesProvider para saber si ya está en favoritos.
                 Consumer(
                   builder: (c, ref2, _) {
                     final favsAsync = ref2.watch(userFavoritesProvider);

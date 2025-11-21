@@ -1,4 +1,4 @@
-// lib/screens/catalog.dart
+// Pantalla principal de catálogo: búsqueda (TextField), resultados (ListView) y sección "Recomendados" (fila horizontal).
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/books_provider.dart';
@@ -49,7 +49,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                     onSubmitted: (value) {
                       ref
                           .read(booksSearchProvider.notifier)
-                          .search(value.trim());
+                          .search(value.trim()); // búsqueda con Enter
                     },
                   ),
                 ),
@@ -71,7 +71,6 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
               error: (e, _) => Center(child: Text('Error: $e')),
             ),
           ),
-
           // Recomendados horizontales
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
@@ -83,7 +82,6 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.indigo)),
-                // puedes poner un botón "Ver todo" si quieres
               ],
             ),
           ),
