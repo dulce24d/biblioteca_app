@@ -20,8 +20,41 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Biblioteca App',
-      theme: ThemeData(primarySwatch: Colors.indigo),
+      title: 'LibSeek',
+      // dentro de MaterialApp (...)
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.indigo,
+        scaffoldBackgroundColor: const Color(0xFFF7F8FA),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          hintStyle: const TextStyle(color: Colors.grey),
+        ),
+        cardTheme: CardThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 3,
+          margin: const EdgeInsets.symmetric(vertical: 8),
+        ),
+
+        // AppBar: título en indigo y iconos en indigo
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.indigo, // Fondo indigo para la barra superior
+          elevation: 0,
+          iconTheme: IconThemeData(
+              color: Colors.white), // iconos blancos (back, menu...)
+          titleTextStyle: TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+          foregroundColor: Colors.white, // texto blanco
+        ),
+      ),
+
       home: authState.when(
         data: (user) => user != null ? const HomeScreen() : const LoginScreen(),
         loading: () =>
