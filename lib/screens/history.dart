@@ -1,5 +1,7 @@
+// lib/screens/history.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../providers/history_provider.dart';
 import '../widgets/loan_tile.dart';
 import '../providers/auth_provider.dart';
@@ -8,67 +10,54 @@ class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // userLoansProvider es un StreamProvider que expone la lista de préstamos del usuario
     final loansAsync = ref.watch(userLoansProvider);
-    // authStateProvider expone el usuario actual (User?) para comprobar permisos
     final user = ref.watch(authStateProvider).asData?.value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Historial de Prestamos")),
+      appBar: AppBar(title: const Text("Historial de préstamos")),
       body: loansAsync.when(
-        // Cuando hay datos, construimos un ListView con tarjetas por préstamo
-        data: (loans) => ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: loans.length,
-          itemBuilder: (_, i) {
-            final loan = loans[i];
-            return Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // mostramos título y fecha (substring(0,10) para cortar la parte de tiempo)
-                        Text(loan.bookTitle,
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text(
-                            "Prestado: ${loan.dateStart.toString().substring(0, 10)}"),
-                      ],
-                    ),
-                    // Si ya fue devuelto mostramos icono, sino botón para marcarlo devuelto
-                    loan.returned
-                        ? const Icon(Icons.check_circle, color: Colors.green)
-                        // <- aquí pasamos la closure que llama al provider
-                        : ElevatedButton(
-                            onPressed: () {
-                              if (user == null) {
-                                // Si no hay usuario logueado mostramos un SnackBar
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Debes iniciar sesión')),
-                                );
-                                return;
-                              }
-                              // Llamamos al provider de acciones para marcar como devuelto
-                              ref
-                                  .read(historyActionsProvider)
-                                  .markReturned(user.uid, loan.id);
-                            },
-                            child: const Text("Devolver"),
-                          ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-        // mientras carga mostramos indicador
+        data: (loans) {
+          if (loans.isEmpty)
+            return const Center(child: Text('No tienes préstamos registrados'));
+
+          return ListView.separated(
+            padding: const EdgeInsets.all(12),
+            itemCount: loans.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (context, i) {
+              final loan = loans[i];
+
+              // Usamos LoanTile (que solo acepta onReturn), no pasamos onTap ahí.
+              return LoanTile(
+                loan: loan,
+                onReturn: loan.returned
+                    ? (_) {}
+                    : (loanId) async {
+                        if (user == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Debes iniciar sesión')));
+                          return;
+                        }
+                        try {
+                          await ref
+                              .read(historyActionsProvider)
+                              .markReturned(user.uid, loanId);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Préstamo marcado como devuelto')));
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content:
+                                  Text('Error al marcar como devuelto: $e')));
+                        }
+                      },
+              );
+            },
+          );
+        },
         loading: () => const Center(child: CircularProgressIndicator()),
-        // en caso de error lo mostramos en la UI
         error: (e, _) => Center(child: Text("Error: $e")),
       ),
     );

@@ -1,6 +1,7 @@
-/*widget sencillo que delega la acción onReturn al padre 
-— esto es útil para mantener la UI desacoplada de la lógica 
-de acceso a la base de datos.*/
+// lib/widgets/loan_tile.dart
+/* widget sencillo que delega la acción onReturn al padre 
+   — útil para mantener la UI desacoplada de la lógica de acceso a la BD. */
+
 import 'package:flutter/material.dart';
 import '../models/loan.dart';
 import '../core/utils.dart';
@@ -8,6 +9,7 @@ import '../core/utils.dart';
 class LoanTile extends StatelessWidget {
   final Loan loan;
   final void Function(String loanId) onReturn;
+
   const LoanTile({required this.loan, required this.onReturn, super.key});
 
   @override

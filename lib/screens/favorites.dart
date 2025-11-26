@@ -1,5 +1,5 @@
-// Pantalla de favoritos: lista de Book Cards dentro de Cards blancas con acciones Ver/Eliminar.
-// Usa proxy para images (corsProxy) para evitar bloqueos en web.
+// lib/screens/favorites.dart
+// Lista de favoritos usando userFavoritesProvider y acciones desde favoritesActionsProvider.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +9,7 @@ import '../models/book.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/auth_provider.dart';
 import '../core/constants.dart';
-import 'book_detail_placeholder.dart'; // pantalla de detalle
+import 'book_detail_placeholder.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({Key? key}) : super(key: key);
@@ -19,14 +19,13 @@ class FavoritesScreen extends ConsumerWidget {
     var fixed = rawUrl;
     if (fixed.startsWith('http://'))
       fixed = fixed.replaceFirst(RegExp(r'^http:'), 'https:');
-    if (corsProxy != null && corsProxy!.isNotEmpty) {
-      return '${corsProxy!}/${Uri.encodeFull(fixed)}';
-    }
-    return fixed;
+    if (corsProxy == null || corsProxy!.isEmpty) return fixed;
+    final encoded = Uri.encodeComponent(fixed);
+    return '${corsProxy!}?url=$encoded';
   }
 
   Widget _favCard(BuildContext context, WidgetRef ref, Book book) {
-    final img = _proxiedImageUrl(book.thumbnail);
+    final img = _proxiedImageUrl(book.thumbnail ?? '');
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
@@ -38,32 +37,31 @@ class FavoritesScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(14),
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: 70,
-                  height: 98,
-                  child: img.isEmpty
-                      ? Container(
-                          color: const Color(0xFFF6F6F6),
-                          child: const Icon(Icons.menu_book,
-                              size: 34, color: Colors.black38))
-                      : CachedNetworkImage(
-                          imageUrl: img,
-                          fit: BoxFit.cover,
-                          placeholder: (c, u) =>
-                              Container(color: const Color(0xFFF6F6F6)),
-                          errorWidget: (c, u, e) => Container(
-                              color: const Color(0xFFF6F6F6),
-                              child: const Icon(Icons.broken_image)),
-                        ),
-                ),
+          child: Row(children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 70,
+                height: 98,
+                child: img.isEmpty
+                    ? Container(
+                        color: const Color(0xFFF6F6F6),
+                        child: const Icon(Icons.menu_book,
+                            size: 34, color: Colors.black38))
+                    : CachedNetworkImage(
+                        imageUrl: img,
+                        fit: BoxFit.cover,
+                        placeholder: (c, u) =>
+                            Container(color: const Color(0xFFF6F6F6)),
+                        errorWidget: (c, u, e) => Container(
+                            color: const Color(0xFFF6F6F6),
+                            child: const Icon(Icons.broken_image)),
+                      ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(book.title,
@@ -78,58 +76,53 @@ class FavoritesScreen extends ConsumerWidget {
                             : 'Autor desconocido',
                         style: const TextStyle(color: Colors.black54)),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            // navegar al detalle
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) =>
-                                        BookDetailScreen(book: book)));
-                          },
-                          icon: const Icon(Icons.open_in_new, size: 18),
-                          label: const Text('Ver'),
-                          style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(80, 36)),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            final user =
-                                ref.read(authStateProvider).asData?.value;
-                            if (user == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Inicia sesión primero')));
-                              return;
-                            }
-                            try {
-                              await ref
-                                  .read(favoritesActionsProvider)
-                                  .removeFavorite(book.id);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Eliminado de favoritos')));
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error: $e')));
-                            }
-                          },
-                          icon: const Icon(Icons.delete_outline, size: 18),
-                          label: const Text('Eliminar'),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent,
-                              minimumSize: const Size(100, 36)),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
+                    Row(children: [
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) =>
+                                      BookDetailScreen(book: book)));
+                        },
+                        icon: const Icon(Icons.open_in_new, size: 18),
+                        label: const Text('Ver'),
+                        style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(80, 36)),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final user =
+                              ref.read(authStateProvider).asData?.value;
+                          if (user == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Inicia sesión primero')));
+                            return;
+                          }
+                          try {
+                            await ref
+                                .read(favoritesActionsProvider)
+                                .removeFavorite(book.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Eliminado de favoritos')));
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: $e')));
+                          }
+                        },
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        label: const Text('Eliminar'),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            minimumSize: const Size(100, 36)),
+                      ),
+                    ]),
+                  ]),
+            ),
+          ]),
         ),
       ),
     );
@@ -140,9 +133,7 @@ class FavoritesScreen extends ConsumerWidget {
     final favsAsync = ref.watch(userFavoritesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-          title: const Text(
-              'LibSeek - Favoritos')), // AppBar con nombre de la app arriba
+      appBar: AppBar(title: const Text('LibSeek - Favoritos')),
       body: favsAsync.when(
         data: (list) {
           if (list.isEmpty)
